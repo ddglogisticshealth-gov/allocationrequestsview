@@ -692,6 +692,108 @@ tr:last-child td {
     border: 1px solid #90caf9;
 }
 
+/* ========== CHARTS GRID - UPDATED ========== */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.chart-card h4 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary-light);
+    flex-shrink: 0;
+}
+
+.chart-card canvas {
+    flex-grow: 1;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 250px;
+}
+
+/* Analytics specific charts */
+#viewAnalyticsTab .charts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+#viewAnalyticsTab .chart-card {
+    padding: 24px;
+    min-height: 350px;
+}
+
+#viewAnalyticsTab .chart-card h4 {
+    margin-bottom: 20px;
+}
+.summary-tables .data-table-container {
+    margin-bottom: 30px;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+
+.summary-tables .data-table-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-tables .data-table-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-card {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-tables .data-table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .summary-tables .data-table-header .btn {
+        align-self: flex-end;
+    }
+}
 /* ========== MODAL STYLES - ENHANCED ========== */
 .modal {
     display: none;
@@ -3104,6 +3206,7 @@ tr:last-child td {
             <div class="view-only-tabs">
                 <!-- KEEP ONLY View Allocation Status tab -->
                 <div class="view-only-tab active" data-tab="viewAllocations">View Allocation Status</div>
+		<div class="view-only-tab" data-tab="viewAnalytics">Analytics Dashboard</div>
                 <!-- REMOVE ALL OTHER TABS -->
             </div>
             
@@ -3162,11 +3265,214 @@ tr:last-child td {
                 </div>
             </div>
             
-            <!-- REMOVE ALL OTHER VIEW TABS (viewRequestsTab, viewHistoryTab, viewVoteDistributionTab, etc.) -->
-            
+           <!-- Analytics Tab -->
+<div id="viewAnalyticsTab" class="admin-tab-content hidden">
+    <div class="allocation-history">
+        <h2 class="section-title">Analytics Dashboard</h2>
+        
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-value" id="analyticsTotalAmount">0</div>
+                <div class="stat-label">Total Requested</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="analyticsApprovedAmount">0</div>
+                <div class="stat-label">Total Approved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+                <div class="stat-value" id="analyticsApprovalRate">0%</div>
+                <div class="stat-label">Approval Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-hospital"></i></div>
+                <div class="stat-value" id="analyticsHospitalsCount">0</div>
+                <div class="stat-label">Active Hospitals</div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="admin-controls">
+            <div class="filter-control">
+                <label class="form-label" for="analyticsYearFilter">Year</label>
+                <select id="analyticsYearFilter" class="form-control">
+                    <option value="all">All Years</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+            <div class="filter-control">
+                <label class="form-label" for="analyticsVoteFilter">Vote Number</label>
+                <select id="analyticsVoteFilter" class="form-control">
+                    <option value="all">All Votes</option>
+                </select>
+            </div>
+            <div class="filter-control">
+                <label class="form-label" for="analyticsHospitalFilter">Hospital</label>
+                <select id="analyticsHospitalFilter" class="form-control">
+                    <option value="all">All Hospitals</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="charts-section">
+    <h3 class="section-title">Analytics Charts</h3>
+    
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h4>Monthly Allocation Trend</h4>
+            <canvas id="monthlyTrendChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h4>Vote-wise Distribution</h4>
+            <canvas id="voteDistributionAnalyticsChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h4>Hospital-wise Allocation</h4>
+            <canvas id="hospitalAllocationChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h4>Status Distribution</h4>
+            <canvas id="statusDistributionChart"></canvas>
         </div>
     </div>
 </div>
+        
+        <!-- Summary Tables -->
+        <div class="summary-tables" style="margin-bottom: 32px;">
+            <h3 class="section-title">Summary Tables</h3>
+            
+            <!-- Hospital Summary -->
+            <div class="data-table-container" style="margin-bottom: 32px;">
+                <div class="data-table-header">
+                    <div class="data-table-title">Hospital-wise Summary</div>
+                    <button id="exportHospitalSummaryAnalytics" class="btn btn-sm">Export to Excel</button>
+                </div>
+                <div class="table-scroll-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Hospital</th>
+                                <th>Total Requests</th>
+                                <th>Pending</th>
+                                <th>Approved</th>
+                                <th>Rejected</th>
+                                <th>Requested Amount</th>
+                                <th>Approved Amount</th>
+                                <th>Approval Rate</th>
+                                <th>Avg. Processing Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hospitalAnalyticsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Vote Summary -->
+            <div class="data-table-container" style="margin-bottom: 32px;">
+                <div class="data-table-header">
+                    <div class="data-table-title">Vote-wise Summary</div>
+                    <button id="exportVoteSummaryAnalytics" class="btn btn-sm">Export to Excel</button>
+                </div>
+                <div class="table-scroll-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Vote Number</th>
+                                <th>Total Requests</th>
+                                <th>Approved</th>
+                                <th>Rejected</th>
+                                <th>Total Requested</th>
+                                <th>Total Approved</th>
+                                <th>Approval Rate</th>
+                                <th>Avg. Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="voteAnalyticsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Monthly Summary -->
+            <div class="data-table-container">
+                <div class="data-table-header">
+                    <div class="data-table-title">Monthly Summary</div>
+                    <button id="exportMonthlySummaryAnalytics" class="btn btn-sm">Export to Excel</button>
+                </div>
+                <div class="table-scroll-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Requests</th>
+                                <th>Approved</th>
+                                <th>Rejected</th>
+                                <th>Total Requested</th>
+                                <th>Total Approved</th>
+                                <th>Approval Rate</th>
+                                <th>Avg. Processing Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyAnalyticsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Data Table -->
+        <div class="detailed-data" style="margin-bottom: 32px;">
+            <h3 class="section-title">Detailed Allocation Data</h3>
+            
+            <div class="admin-controls">
+                <div class="search-control filter-control">
+                    <label class="form-label" for="searchAnalyticsData">Search Data</label>
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchAnalyticsData" class="form-control" placeholder="Search by hospital, vote number, or reference">
+                    </div>
+                </div>
+                <div class="filter-control">
+                    <label class="form-label">&nbsp;</label>
+                    <button id="exportAllAnalyticsData" class="btn">Export All Data to Excel</button>
+                </div>
+            </div>
+            
+            <div class="table-scroll-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ref No.</th>
+                            <th>Hospital</th>
+                            <th>Vote Number</th>
+                            <th>Job Description</th>
+                            <th>Requested Amount</th>
+                            <th>Approved Amount</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Submitted Date</th>
+                            <th>Approved Date</th>
+                            <th>Processing Time</th>
+                            <th>Approving Authority</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailedAnalyticsTableBody"></tbody>
+                </table>
+            </div>
+            
+            <div class="pagination">
+                <button id="analyticsPrevPage" disabled>Previous</button>
+                <span class="pagination-info" id="analyticsPageInfo">Page 1 of 1</span>
+                <button id="analyticsNextPage" disabled>Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+            
+     
        <!-- Approval Modal -->
     <div id="approvalModal" class="modal hidden">
         <div class="modal-content">
@@ -5778,7 +6084,898 @@ async function rejectAllocation() {
         confirmRejectionBtn.disabled = false;
     }
 }
+// Add these functions to your existing JavaScript:
 
+// Initialize Analytics
+async function loadAnalyticsData() {
+    try {
+        const allocationsResult = await callGoogleAppsScript('getAllocations');
+        allAllocations = allocationsResult.allocations || [];
+        
+        updateAnalyticsStats();
+        populateAnalyticsFilters();
+        updateAnalyticsCharts();
+        updateAnalyticsTables();
+        updateDetailedAnalyticsTable();
+        
+        // Setup event listeners for analytics filters
+        setupAnalyticsEventListeners();
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+    }
+}
+
+// Update Analytics Statistics
+function updateAnalyticsStats() {
+    if (allAllocations.length === 0) return;
+    
+    // Total requested amount
+    const totalRequested = allAllocations.reduce((sum, allocation) => {
+        return sum + parseFloat(allocation.requiredamount || 0);
+    }, 0);
+    
+    // Total approved amount
+    const totalApproved = allAllocations
+        .filter(a => a.status === 'Approved')
+        .reduce((sum, allocation) => {
+            return sum + parseFloat(allocation.approvedamount || allocation.requiredamount || 0);
+        }, 0);
+    
+    // Approval rate
+    const totalApprovedCount = allAllocations.filter(a => a.status === 'Approved').length;
+    const approvalRate = allAllocations.length > 0 ? 
+        Math.round((totalApprovedCount / allAllocations.length) * 100) : 0;
+    
+    // Unique hospitals
+    const uniqueHospitals = [...new Set(allAllocations.map(a => a.hospitalname))];
+    
+    // Update UI
+    document.getElementById('analyticsTotalAmount').textContent = formatCurrency(totalRequested);
+    document.getElementById('analyticsApprovedAmount').textContent = formatCurrency(totalApproved);
+    document.getElementById('analyticsApprovalRate').textContent = `${approvalRate}%`;
+    document.getElementById('analyticsHospitalsCount').textContent = uniqueHospitals.length;
+}
+
+// Populate Analytics Filters
+function populateAnalyticsFilters() {
+    // Populate vote filter
+    const voteFilter = document.getElementById('analyticsVoteFilter');
+    const uniqueVotes = [...new Set(allAllocations.map(a => a.votenumber).filter(Boolean))];
+    voteFilter.innerHTML = '<option value="all">All Votes</option>';
+    uniqueVotes.forEach(vote => {
+        const option = document.createElement('option');
+        option.value = vote;
+        option.textContent = vote;
+        voteFilter.appendChild(option);
+    });
+    
+    // Populate hospital filter
+    const hospitalFilter = document.getElementById('analyticsHospitalFilter');
+    const uniqueHospitals = [...new Set(allAllocations.map(a => a.hospitalname).filter(Boolean))];
+    hospitalFilter.innerHTML = '<option value="all">All Hospitals</option>';
+    uniqueHospitals.forEach(hospital => {
+        const option = document.createElement('option');
+        option.value = hospital;
+        option.textContent = hospital;
+        hospitalFilter.appendChild(option);
+    });
+}
+
+// Setup Analytics Event Listeners
+function setupAnalyticsEventListeners() {
+    const yearFilter = document.getElementById('analyticsYearFilter');
+    const voteFilter = document.getElementById('analyticsVoteFilter');
+    const hospitalFilter = document.getElementById('analyticsHospitalFilter');
+    const searchFilter = document.getElementById('searchAnalyticsData');
+    
+    if (yearFilter) yearFilter.addEventListener('change', updateAnalyticsData);
+    if (voteFilter) voteFilter.addEventListener('change', updateAnalyticsData);
+    if (hospitalFilter) hospitalFilter.addEventListener('change', updateAnalyticsData);
+    if (searchFilter) searchFilter.addEventListener('input', updateDetailedAnalyticsTable);
+    
+    // Export buttons
+    document.getElementById('exportHospitalSummaryAnalytics')?.addEventListener('click', exportHospitalSummaryAnalytics);
+    document.getElementById('exportVoteSummaryAnalytics')?.addEventListener('click', exportVoteSummaryAnalytics);
+    document.getElementById('exportMonthlySummaryAnalytics')?.addEventListener('click', exportMonthlySummaryAnalytics);
+    document.getElementById('exportAllAnalyticsData')?.addEventListener('click', exportAllAnalyticsData);
+    
+    // Pagination
+    document.getElementById('analyticsPrevPage')?.addEventListener('click', goToAnalyticsPrevPage);
+    document.getElementById('analyticsNextPage')?.addEventListener('click', goToAnalyticsNextPage);
+}
+
+// Filter analytics data
+function getFilteredAnalyticsData() {
+    const yearFilter = document.getElementById('analyticsYearFilter')?.value || 'all';
+    const voteFilter = document.getElementById('analyticsVoteFilter')?.value || 'all';
+    const hospitalFilter = document.getElementById('analyticsHospitalFilter')?.value || 'all';
+    
+    let filteredData = [...allAllocations];
+    
+    // Filter by year
+    if (yearFilter !== 'all') {
+        filteredData = filteredData.filter(allocation => {
+            const allocationYear = new Date(allocation.timestamp).getFullYear().toString();
+            return allocationYear === yearFilter;
+        });
+    }
+    
+    // Filter by vote
+    if (voteFilter !== 'all') {
+        filteredData = filteredData.filter(allocation => allocation.votenumber === voteFilter);
+    }
+    
+    // Filter by hospital
+    if (hospitalFilter !== 'all') {
+        filteredData = filteredData.filter(allocation => allocation.hospitalname === hospitalFilter);
+    }
+    
+    return filteredData;
+}
+
+// Update all analytics components
+function updateAnalyticsData() {
+    updateAnalyticsStats();
+    updateAnalyticsCharts();
+    updateAnalyticsTables();
+    updateDetailedAnalyticsTable();
+}
+
+// Update Analytics Charts
+function updateAnalyticsCharts() {
+    const filteredData = getFilteredAnalyticsData();
+    
+    // Monthly Trend Chart
+    updateMonthlyTrendChart(filteredData);
+    
+    // Vote Distribution Chart
+    updateVoteDistributionAnalyticsChart(filteredData);
+    
+    // Hospital Allocation Chart
+    updateHospitalAllocationChart(filteredData);
+    
+    // Status Distribution Chart
+    updateStatusDistributionChart(filteredData);
+}
+
+// Monthly Trend Chart
+function updateMonthlyTrendChart(data) {
+    const ctx = document.getElementById('monthlyTrendChart')?.getContext('2d');
+    if (!ctx) return;
+    
+    // Group by month
+    const monthlyData = {};
+    data.forEach(allocation => {
+        const date = new Date(allocation.timestamp);
+        const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+        
+        if (!monthlyData[monthYear]) {
+            monthlyData[monthYear] = {
+                requested: 0,
+                approved: 0,
+                count: 0
+            };
+        }
+        
+        monthlyData[monthYear].requested += parseFloat(allocation.requiredamount || 0);
+        monthlyData[monthYear].count++;
+        
+        if (allocation.status === 'Approved') {
+            monthlyData[monthYear].approved += parseFloat(allocation.approvedamount || allocation.requiredamount || 0);
+        }
+    });
+    
+    const months = Object.keys(monthlyData).sort();
+    const requestedData = months.map(month => monthlyData[month].requested);
+    const approvedData = months.map(month => monthlyData[month].approved);
+    
+    if (window.monthlyTrendChartInstance) {
+        window.monthlyTrendChartInstance.destroy();
+    }
+    
+    window.monthlyTrendChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months.map(m => {
+                const [year, month] = m.split('-');
+                return new Date(year, month-1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            }),
+            datasets: [
+                {
+                    label: 'Requested Amount',
+                    data: requestedData,
+                    borderColor: 'rgba(26, 115, 232, 1)',
+                    backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Approved Amount',
+                    data: approvedData,
+                    borderColor: 'rgba(52, 168, 83, 1)',
+                    backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount (LKR)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            if (value >= 1000000) {
+                                return 'LKR ' + (value / 1000000).toFixed(1) + 'M';
+                            } else if (value >= 1000) {
+                                return 'LKR ' + (value / 1000).toFixed(0) + 'K';
+                            }
+                            return 'LKR ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Vote Distribution Analytics Chart
+function updateVoteDistributionAnalyticsChart(data) {
+    const ctx = document.getElementById('voteDistributionAnalyticsChart')?.getContext('2d');
+    if (!ctx) return;
+    
+    // Group by vote
+    const voteData = {};
+    data.forEach(allocation => {
+        const vote = allocation.votenumber || 'Unknown';
+        if (!voteData[vote]) {
+            voteData[vote] = {
+                requested: 0,
+                approved: 0
+            };
+        }
+        voteData[vote].requested += parseFloat(allocation.requiredamount || 0);
+        if (allocation.status === 'Approved') {
+            voteData[vote].approved += parseFloat(allocation.approvedamount || allocation.requiredamount || 0);
+        }
+    });
+    
+    const votes = Object.keys(voteData).slice(0, 10); // Top 10 votes
+    const requestedData = votes.map(vote => voteData[vote].requested);
+    
+    if (window.voteDistributionAnalyticsChartInstance) {
+        window.voteDistributionAnalyticsChartInstance.destroy();
+    }
+    
+    window.voteDistributionAnalyticsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: votes,
+            datasets: [{
+                label: 'Total Requested',
+                data: requestedData,
+                backgroundColor: 'rgba(26, 95, 122, 0.7)',
+                borderColor: 'rgba(26, 95, 122, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount (LKR)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Hospital Allocation Chart
+function updateHospitalAllocationChart(data) {
+    const ctx = document.getElementById('hospitalAllocationChart')?.getContext('2d');
+    if (!ctx) return;
+    
+    // Group by hospital
+    const hospitalData = {};
+    data.forEach(allocation => {
+        const hospital = allocation.hospitalname || 'Unknown';
+        if (!hospitalData[hospital]) {
+            hospitalData[hospital] = {
+                requested: 0,
+                count: 0
+            };
+        }
+        hospitalData[hospital].requested += parseFloat(allocation.requiredamount || 0);
+        hospitalData[hospital].count++;
+    });
+    
+    const hospitals = Object.keys(hospitalData)
+        .sort((a, b) => hospitalData[b].requested - hospitalData[a].requested)
+        .slice(0, 8); // Top 8 hospitals
+    
+    const requestedData = hospitals.map(hospital => hospitalData[hospital].requested);
+    const colors = generateChartColors(hospitals.length);
+    
+    if (window.hospitalAllocationChartInstance) {
+        window.hospitalAllocationChartInstance.destroy();
+    }
+    
+    window.hospitalAllocationChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: hospitals,
+            datasets: [{
+                data: requestedData,
+                backgroundColor: colors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const total = requestedData.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Status Distribution Chart
+function updateStatusDistributionChart(data) {
+    const ctx = document.getElementById('statusDistributionChart')?.getContext('2d');
+    if (!ctx) return;
+    
+    // Group by status
+    const statusData = {
+        'Pending': 0,
+        'Approved': 0,
+        'Rejected': 0,
+        'Completed': 0
+    };
+    
+    data.forEach(allocation => {
+        statusData[allocation.status] = (statusData[allocation.status] || 0) + 1;
+    });
+    
+    const statuses = Object.keys(statusData);
+    const counts = statuses.map(status => statusData[status]);
+    const colors = {
+        'Pending': '#ffc107',
+        'Approved': '#28a745',
+        'Rejected': '#dc3545',
+        'Completed': '#17a2b8'
+    };
+    
+    if (window.statusDistributionChartInstance) {
+        window.statusDistributionChartInstance.destroy();
+    }
+    
+    window.statusDistributionChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: statuses,
+            datasets: [{
+                data: counts,
+                backgroundColor: statuses.map(status => colors[status]),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const total = counts.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${context.label}: ${value} requests (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Generate chart colors
+function generateChartColors(count) {
+    const colors = [];
+    const baseColor = [26, 95, 122]; // Primary color
+    const step = 360 / count;
+    
+    for (let i = 0; i < count; i++) {
+        const hue = (i * step) % 360;
+        colors.push(`hsla(${hue}, 70%, 50%, 0.7)`);
+    }
+    
+    return colors;
+}
+
+// Update Analytics Tables
+function updateAnalyticsTables() {
+    const filteredData = getFilteredAnalyticsData();
+    
+    // Hospital Summary Table
+    updateHospitalAnalyticsTable(filteredData);
+    
+    // Vote Summary Table
+    updateVoteAnalyticsTable(filteredData);
+    
+    // Monthly Summary Table
+    updateMonthlyAnalyticsTable(filteredData);
+}
+
+// Hospital Analytics Table
+function updateHospitalAnalyticsTable(data) {
+    const tableBody = document.getElementById('hospitalAnalyticsTableBody');
+    if (!tableBody) return;
+    
+    // Group by hospital
+    const hospitalData = {};
+    data.forEach(allocation => {
+        const hospital = allocation.hospitalname;
+        if (!hospitalData[hospital]) {
+            hospitalData[hospital] = {
+                total: 0,
+                pending: 0,
+                approved: 0,
+                rejected: 0,
+                requested: 0,
+                approvedAmount: 0,
+                processingTimes: []
+            };
+        }
+        
+        hospitalData[hospital].total++;
+        hospitalData[hospital][allocation.status.toLowerCase()]++;
+        hospitalData[hospital].requested += parseFloat(allocation.requiredamount || 0);
+        
+        if (allocation.status === 'Approved') {
+            hospitalData[hospital].approvedAmount += parseFloat(allocation.approvedamount || allocation.requiredamount || 0);
+        }
+        
+        // Calculate processing time for approved requests
+        if (allocation.status === 'Approved' && allocation.timestamp && allocation.approvaldate) {
+            const submitDate = new Date(allocation.timestamp);
+            const approveDate = new Date(allocation.approvaldate);
+            const diffTime = Math.abs(approveDate - submitDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            hospitalData[hospital].processingTimes.push(diffDays);
+        }
+    });
+    
+    tableBody.innerHTML = '';
+    Object.keys(hospitalData).forEach(hospital => {
+        const data = hospitalData[hospital];
+        const approvalRate = data.total > 0 ? Math.round((data.approved / data.total) * 100) : 0;
+        const avgProcessingTime = data.processingTimes.length > 0 ? 
+            Math.round(data.processingTimes.reduce((a, b) => a + b, 0) / data.processingTimes.length) : 0;
+        
+        const tr = document.createElement('tr');
+        tr.className = 'enhanced-table-row';
+        tr.innerHTML = `
+            <td>${hospital}</td>
+            <td>${data.total}</td>
+            <td>${data.pending}</td>
+            <td>${data.approved}</td>
+            <td>${data.rejected}</td>
+            <td>${formatCurrency(data.requested)}</td>
+            <td>${formatCurrency(data.approvedAmount)}</td>
+            <td>${approvalRate}%</td>
+            <td>${avgProcessingTime} days</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+// Vote Analytics Table
+function updateVoteAnalyticsTable(data) {
+    const tableBody = document.getElementById('voteAnalyticsTableBody');
+    if (!tableBody) return;
+    
+    // Group by vote
+    const voteData = {};
+    data.forEach(allocation => {
+        const vote = allocation.votenumber || 'Unknown';
+        if (!voteData[vote]) {
+            voteData[vote] = {
+                total: 0,
+                approved: 0,
+                rejected: 0,
+                requested: 0,
+                approvedAmount: 0
+            };
+        }
+        
+        voteData[vote].total++;
+        voteData[vote][allocation.status.toLowerCase()]++;
+        voteData[vote].requested += parseFloat(allocation.requiredamount || 0);
+        
+        if (allocation.status === 'Approved') {
+            voteData[vote].approvedAmount += parseFloat(allocation.approvedamount || allocation.requiredamount || 0);
+        }
+    });
+    
+    tableBody.innerHTML = '';
+    Object.keys(voteData).forEach(vote => {
+        const data = voteData[vote];
+        const approvalRate = data.total > 0 ? Math.round((data.approved / data.total) * 100) : 0;
+        const avgAmount = data.total > 0 ? data.requested / data.total : 0;
+        
+        const tr = document.createElement('tr');
+        tr.className = 'enhanced-table-row';
+        tr.innerHTML = `
+            <td>${vote}</td>
+            <td>${data.total}</td>
+            <td>${data.approved}</td>
+            <td>${data.rejected}</td>
+            <td>${formatCurrency(data.requested)}</td>
+            <td>${formatCurrency(data.approvedAmount)}</td>
+            <td>${approvalRate}%</td>
+            <td>${formatCurrency(avgAmount)}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+// Monthly Analytics Table
+function updateMonthlyAnalyticsTable(data) {
+    const tableBody = document.getElementById('monthlyAnalyticsTableBody');
+    if (!tableBody) return;
+    
+    // Group by month
+    const monthlyData = {};
+    data.forEach(allocation => {
+        const date = new Date(allocation.timestamp);
+        const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+        const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        
+        if (!monthlyData[monthYear]) {
+            monthlyData[monthYear] = {
+                name: monthName,
+                total: 0,
+                approved: 0,
+                rejected: 0,
+                requested: 0,
+                approvedAmount: 0,
+                processingTimes: []
+            };
+        }
+        
+        monthlyData[monthYear].total++;
+        monthlyData[monthYear][allocation.status.toLowerCase()]++;
+        monthlyData[monthYear].requested += parseFloat(allocation.requiredamount || 0);
+        
+        if (allocation.status === 'Approved') {
+            monthlyData[monthYear].approvedAmount += parseFloat(allocation.approvedamount || allocation.requiredamount || 0);
+        }
+        
+        // Calculate processing time
+        if (allocation.status === 'Approved' && allocation.timestamp && allocation.approvaldate) {
+            const submitDate = new Date(allocation.timestamp);
+            const approveDate = new Date(allocation.approvaldate);
+            const diffTime = Math.abs(approveDate - submitDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            monthlyData[monthYear].processingTimes.push(diffDays);
+        }
+    });
+    
+    tableBody.innerHTML = '';
+    const sortedMonths = Object.keys(monthlyData).sort().reverse();
+    
+    sortedMonths.forEach(month => {
+        const data = monthlyData[month];
+        const approvalRate = data.total > 0 ? Math.round((data.approved / data.total) * 100) : 0;
+        const avgProcessingTime = data.processingTimes.length > 0 ? 
+            Math.round(data.processingTimes.reduce((a, b) => a + b, 0) / data.processingTimes.length) : 0;
+        
+        const tr = document.createElement('tr');
+        tr.className = 'enhanced-table-row';
+        tr.innerHTML = `
+            <td>${data.name}</td>
+            <td>${data.total}</td>
+            <td>${data.approved}</td>
+            <td>${data.rejected}</td>
+            <td>${formatCurrency(data.requested)}</td>
+            <td>${formatCurrency(data.approvedAmount)}</td>
+            <td>${approvalRate}%</td>
+            <td>${avgProcessingTime} days</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+// Detailed Analytics Table with Pagination
+let analyticsCurrentPage = 1;
+let filteredAnalyticsData = [];
+const analyticsItemsPerPage = 10;
+
+function updateDetailedAnalyticsTable() {
+    const filteredData = getFilteredAnalyticsData();
+    const searchTerm = document.getElementById('searchAnalyticsData')?.value.toLowerCase() || '';
+    
+    // Filter by search term
+    filteredAnalyticsData = filteredData.filter(allocation => {
+        const searchMatch = !searchTerm || 
+            allocation.refnumber?.toLowerCase().includes(searchTerm) ||
+            allocation.hospitalname?.toLowerCase().includes(searchTerm) ||
+            allocation.votenumber?.toLowerCase().includes(searchTerm) ||
+            allocation.jobdescription?.toLowerCase().includes(searchTerm);
+        
+        return searchMatch;
+    });
+    
+    analyticsCurrentPage = 1;
+    displayDetailedAnalyticsTable();
+    updateAnalyticsPagination();
+}
+
+function displayDetailedAnalyticsTable() {
+    const tableBody = document.getElementById('detailedAnalyticsTableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    if (filteredAnalyticsData.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="12" class="text-center">No data found</td></tr>';
+        return;
+    }
+    
+    const startIndex = (analyticsCurrentPage - 1) * analyticsItemsPerPage;
+    const endIndex = Math.min(startIndex + analyticsItemsPerPage, filteredAnalyticsData.length);
+    const currentPageData = filteredAnalyticsData.slice(startIndex, endIndex);
+    
+    currentPageData.forEach(allocation => {
+        const statusBadge = getEnhancedStatusBadge(allocation.status, true);
+        
+        // Calculate processing time
+        let processingTime = 'N/A';
+        if (allocation.status === 'Approved' && allocation.timestamp && allocation.approvaldate) {
+            const submitDate = new Date(allocation.timestamp);
+            const approveDate = new Date(allocation.approvaldate);
+            const diffTime = Math.abs(approveDate - submitDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            processingTime = `${diffDays} days`;
+        }
+        
+        const tr = document.createElement('tr');
+        tr.className = 'enhanced-table-row';
+        tr.innerHTML = `
+            <td>${allocation.refnumber}</td>
+            <td>${allocation.hospitalname}</td>
+            <td>${allocation.votenumber}</td>
+            <td>${allocation.jobdescription?.substring(0, 50) || ''}${allocation.jobdescription?.length > 50 ? '...' : ''}</td>
+            <td>${formatCurrency(allocation.requiredamount)}</td>
+            <td>${allocation.approvedamount > 0 ? formatCurrency(allocation.approvedamount) : 'N/A'}</td>
+            <td>${statusBadge}</td>
+            <td>${allocation.prioritylevel}</td>
+            <td>${formatDate(allocation.timestamp)}</td>
+            <td>${allocation.approvaldate ? formatDate(allocation.approvaldate) : 'N/A'}</td>
+            <td>${processingTime}</td>
+            <td>${allocation.approvingauthority || 'N/A'}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+function updateAnalyticsPagination() {
+    const totalPages = Math.ceil(filteredAnalyticsData.length / analyticsItemsPerPage);
+    document.getElementById('analyticsPageInfo').textContent = `Page ${analyticsCurrentPage} of ${totalPages}`;
+    document.getElementById('analyticsPrevPage').disabled = analyticsCurrentPage === 1;
+    document.getElementById('analyticsNextPage').disabled = analyticsCurrentPage === totalPages || totalPages === 0;
+}
+
+function goToAnalyticsPrevPage() {
+    if (analyticsCurrentPage > 1) {
+        analyticsCurrentPage--;
+        displayDetailedAnalyticsTable();
+        updateAnalyticsPagination();
+    }
+}
+
+function goToAnalyticsNextPage() {
+    const totalPages = Math.ceil(filteredAnalyticsData.length / analyticsItemsPerPage);
+    if (analyticsCurrentPage < totalPages) {
+        analyticsCurrentPage++;
+        displayDetailedAnalyticsTable();
+        updateAnalyticsPagination();
+    }
+}
+
+// Export Functions
+function exportHospitalSummaryAnalytics() {
+    const tableBody = document.getElementById('hospitalAnalyticsTableBody');
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    
+    if (rows.length === 0) {
+        alert('No data to export');
+        return;
+    }
+    
+    let csvContent = "Hospital,Total Requests,Pending,Approved,Rejected,Requested Amount,Approved Amount,Approval Rate,Avg. Processing Time\n";
+    
+    rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('td'));
+        const rowData = cells.map(cell => `"${cell.textContent.trim()}"`).join(',');
+        csvContent += rowData + '\n';
+    });
+    
+    downloadCSV(csvContent, 'hospital_summary_analytics.csv');
+}
+
+function exportVoteSummaryAnalytics() {
+    const tableBody = document.getElementById('voteAnalyticsTableBody');
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    
+    if (rows.length === 0) {
+        alert('No data to export');
+        return;
+    }
+    
+    let csvContent = "Vote Number,Total Requests,Approved,Rejected,Total Requested,Total Approved,Approval Rate,Avg. Amount\n";
+    
+    rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('td'));
+        const rowData = cells.map(cell => `"${cell.textContent.trim()}"`).join(',');
+        csvContent += rowData + '\n';
+    });
+    
+    downloadCSV(csvContent, 'vote_summary_analytics.csv');
+}
+
+function exportMonthlySummaryAnalytics() {
+    const tableBody = document.getElementById('monthlyAnalyticsTableBody');
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    
+    if (rows.length === 0) {
+        alert('No data to export');
+        return;
+    }
+    
+    let csvContent = "Month,Total Requests,Approved,Rejected,Total Requested,Total Approved,Approval Rate,Avg. Processing Time\n";
+    
+    rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('td'));
+        const rowData = cells.map(cell => `"${cell.textContent.trim()}"`).join(',');
+        csvContent += rowData + '\n';
+    });
+    
+    downloadCSV(csvContent, 'monthly_summary_analytics.csv');
+}
+
+function exportAllAnalyticsData() {
+    const filteredData = getFilteredAnalyticsData();
+    
+    if (filteredData.length === 0) {
+        alert('No data to export');
+        return;
+    }
+    
+    let csvContent = "Reference No.,Hospital,Vote Number,Job Description,Requested Amount,Approved Amount,Status,Priority,Submitted Date,Approved Date,Processing Time,Approving Authority,Additional Notes\n";
+    
+    filteredData.forEach(allocation => {
+        // Calculate processing time
+        let processingTime = 'N/A';
+        if (allocation.status === 'Approved' && allocation.timestamp && allocation.approvaldate) {
+            const submitDate = new Date(allocation.timestamp);
+            const approveDate = new Date(allocation.approvaldate);
+            const diffTime = Math.abs(approveDate - submitDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            processingTime = `${diffDays} days`;
+        }
+        
+        const rowData = [
+            `"${allocation.refnumber || ''}"`,
+            `"${allocation.hospitalname || ''}"`,
+            `"${allocation.votenumber || ''}"`,
+            `"${allocation.jobdescription?.replace(/"/g, '""') || ''}"`,
+            `"${formatCurrency(allocation.requiredamount)}"`,
+            `"${allocation.approvedamount > 0 ? formatCurrency(allocation.approvedamount) : 'N/A'}"`,
+            `"${allocation.status || ''}"`,
+            `"${allocation.prioritylevel || ''}"`,
+            `"${formatDate(allocation.timestamp)}"`,
+            `"${allocation.approvaldate ? formatDate(allocation.approvaldate) : 'N/A'}"`,
+            `"${processingTime}"`,
+            `"${allocation.approvingauthority || 'N/A'}"`,
+            `"${allocation.additionalnotes?.replace(/"/g, '""') || ''}"`
+        ].join(',');
+        
+        csvContent += rowData + '\n';
+    });
+    
+    downloadCSV(csvContent, 'complete_analytics_data.csv');
+}
+
+// Helper function to download CSV
+function downloadCSV(content, filename) {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    logSystemActivity('analytics', currentUserRole, 'Data Exported', `File: ${filename}`);
+}
+
+// Update the loadViewOnlyData function to include analytics
+async function loadViewOnlyData() {
+    const viewSpinner = document.getElementById('viewSpinner');
+    showElement(viewSpinner);
+    
+    try {
+        const allocationsResult = await callGoogleAppsScript('getAllocations');
+        allAllocations = allocationsResult.allocations || [];
+        
+        updateViewOnlyStats();
+        updateViewAllocationStatus();
+        
+        // Check if we're on the analytics tab
+        const activeTab = document.querySelector('.view-only-tab.active')?.getAttribute('data-tab');
+        if (activeTab === 'viewAnalytics') {
+            loadAnalyticsData();
+        }
+        
+        // Setup event listeners
+        setupViewOnlyEventListeners();
+        
+    } catch (error) {
+        console.error('Error loading view-only data:', error);
+        document.getElementById('viewPendingAllocationsList').innerHTML = '<div class="text-center">Error loading data</div>';
+    } finally {
+        showElement(viewSpinner, false);
+    }
+}
+
+// Update tab switching for view-only dashboard
+document.querySelectorAll('.view-only-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabId = this.getAttribute('data-tab');
+        
+        document.querySelectorAll('.view-only-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+        
+        this.classList.add('active');
+        
+        if (tabId === 'viewAllocations') {
+            document.getElementById('viewAllocationsTab').classList.remove('hidden');
+        } else if (tabId === 'viewAnalytics') {
+            document.getElementById('viewAnalyticsTab').classList.remove('hidden');
+            loadAnalyticsData();
+        }
+    });
+});
 function openEditModal(requestId) {
     currentRequestId = requestId;
     const allocation = allAllocations.find(a => a.id === requestId);
