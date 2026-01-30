@@ -2179,10 +2179,8 @@ tr:last-child td {
                 <select id="hospitalSelect" class="form-control">
                     <option value="">Select Hospital/User</option>
                     <option value="admin">Administrator</option>
-					<option value="Addional Secretary (Admin 01)">Addional Secretary (Admin 01)</option>
-					<option value="Chief Finance Officer (01)">Chief Finance Officer (01)</option>
-					<option value="Deputy Director General (Planning)">Deputy Director General (Planning)</option>
-		    		<option value="Accountant (Budget Control)">Accountant (Budget Control)</option>
+		    <option value="Deputy Director General (Planning)">Deputy Director General (Planning)</option>
+		    <option value="Accountant (Budget Control)">Accountant (Budget Control)</option>
                      </select>
             </div>
             
@@ -3887,7 +3885,7 @@ let systemLogs = [];
 let currentUserIsViewOnly = false;
 
 // Admin password
-const ADMIN_PASSWORD = "ADS005";
+const ADMIN_PASSWORD = "";
 
 // Pending action variables
 let pendingAction = null;
@@ -3936,8 +3934,7 @@ const hospitalAccounts = {
     'District General Hospital NuwaraEliya': { password: 'dghne123' },
     'District General Hospital Matale': { password: 'dghm123' },
     'National Hospital - Galle (Karapitiya)': { password: 'nhg123' },
-	'Addional Secretary (Admin 01)',password: 'asa0123',
-	'Chief Finance Officer (01)', password: 'cfo0123',
+
     'Deputy Director General (Planning)': { password: 'ddgp123' },
     'Accountant (Budget Control)': { password: 'abc123' },
     'German Sri Lanka Friendship Hospital for Women - Galle (Mahamodara)': { password: 'gslfhwg123' },
@@ -3983,9 +3980,7 @@ const adminAccounts = {
     'ddg_logistics': { name: 'Deputy Director General (Logistics)', password: 'ddg123', permissions: ['full'] },
     'director_building': { name: 'Director Building (Administration)', password: 'dba123', permissions: ['full'] },
     'ddg_planning': { name: 'Deputy Director General (Planning)', password: 'ddgp123', permissions: ['view_only'] },
-    'accountant_budget': { name: 'Accountant (Budget Control)', password: 'abc123', permissions: ['view_only'] },
-    'additional_secretary_admin01': {name: 'Addional Secretary (Admin 01)',password: 'asa0123',permissions: ['view_only']},
-    'chief_finance_officer_01': {name: 'Chief Finance Officer (01)', password: 'cfo0123',permissions: ['view_only']},
+    'accountant_budget': { name: 'Accountant (Budget Control)', password: 'abc123', permissions: ['view_only'] }
 };
 
 // Hospital Signatories Database
@@ -8608,8 +8603,6 @@ const loginInputs = [
     </script>
 </body>
 </html>
-
-
 
 
 
